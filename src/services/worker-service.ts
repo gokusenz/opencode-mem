@@ -561,12 +561,32 @@ async function main() {
       process.exit(cursorResult);
     }
 
+    case 'opencode': {
+      const subcommand = process.argv[3];
+      if (subcommand === 'status') {
+        console.log('\nClaude-mem OpenCode Integration\n');
+        console.log(`Worker port: ${getWorkerPort()}`);
+        console.log(`Worker host: ${getWorkerHost()}`);
+        console.log('\nTo use claude-mem with OpenCode:');
+        console.log('  1. Install: npm install @claude-mem/opencode-plugin');
+        console.log('  2. Add to opencode.json: "plugins": ["@claude-mem/opencode-plugin"]');
+        console.log('  3. Ensure worker is running (starts automatically on first use)');
+      } else {
+        console.log('\nClaude-mem OpenCode Integration\n');
+        console.log('Usage: claude-mem opencode <command>\n');
+        console.log('Commands:');
+        console.log('  status    Check integration status and worker info\n');
+        console.log('For installation, add @claude-mem/opencode-plugin to your OpenCode config.');
+      }
+      process.exit(0);
+    }
+
     case 'hook': {
       const platform = process.argv[3];
       const event = process.argv[4];
       if (!platform || !event) {
         console.error('Usage: claude-mem hook <platform> <event>');
-        console.error('Platforms: claude-code, cursor, raw');
+        console.error('Platforms: claude-code, cursor, opencode, raw');
         console.error('Events: context, session-init, observation, summarize, user-message');
         process.exit(1);
       }

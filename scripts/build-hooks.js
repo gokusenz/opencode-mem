@@ -27,6 +27,12 @@ const CONTEXT_GENERATOR = {
   source: 'src/services/context-generator.ts'
 };
 
+const OPENCODE_PLUGIN = {
+  name: 'opencode-plugin',
+  source: 'opencode-plugin/src/index.ts',
+  outdir: 'opencode-plugin/dist'
+};
+
 async function buildHooks() {
   console.log('🔨 Building claude-mem hooks and worker service...\n');
 
@@ -151,11 +157,36 @@ async function buildHooks() {
     const contextGenStats = fs.statSync(`${hooksDir}/${CONTEXT_GENERATOR.name}.cjs`);
     console.log(`✓ context-generator built (${(contextGenStats.size / 1024).toFixed(2)} KB)`);
 
-    console.log('\n✅ Worker service, MCP server, and context generator built successfully!');
+    // Build OpenCode plugin
+    console.log(`\n🔧 Building OpenCode plugin...`);
+    if (!fs.existsSync(OPENCODE_PLUGIN.outdir)) {
+      fs.mkdirSync(OPENCODE_PLUGIN.outdir, { recursive: true });
+    }
+    await build({
+      entryPoints: [OPENCODE_PLUGIN.source],
+      bundle: true,
+      platform: 'node',
+      target: 'node18',
+      format: 'esm',
+      outfile: `${OPENCODE_PLUGIN.outdir}/index.js`,
+      minify: false, // Keep readable for debugging
+      logLevel: 'error',
+      external: ['@opencode-ai/plugin'],
+      define: {
+        '__DEFAULT_PACKAGE_VERSION__': `"${version}"`
+      }
+    });
+
+    const opencodeStats = fs.statSync(`${OPENCODE_PLUGIN.outdir}/index.js`);
+    console.log(`✓ opencode-plugin built (${(opencodeStats.size / 1024).toFixed(2)} KB)`);
+
+    console.log('\n✅ All components built successfully!');
     console.log(`   Output: ${hooksDir}/`);
     console.log(`   - Worker: worker-service.cjs`);
     console.log(`   - MCP Server: mcp-server.cjs`);
     console.log(`   - Context Generator: context-generator.cjs`);
+    console.log(`   Output: ${OPENCODE_PLUGIN.outdir}/`);
+    console.log(`   - OpenCode Plugin: index.js`);
 
   } catch (error) {
     console.error('\n❌ Build failed:', error.message);
