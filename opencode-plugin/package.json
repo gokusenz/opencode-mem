@@ -1,5 +1,5 @@
 {
-  "name": "@claude-mem/opencode-plugin",
+  "name": "@igokuz/opencode-plugin",
   "version": "1.0.0",
   "description": "Claude-mem persistent memory plugin for OpenCode",
   "type": "module",
