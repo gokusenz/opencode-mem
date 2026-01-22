@@ -8,7 +8,50 @@
  * 4. Exposing search tools for querying memory
  */
 
-import type { Plugin, Hooks } from '@opencode-ai/plugin';
+/**
+ * OpenCode Plugin Types
+ *
+ * These types define the interface expected by OpenCode's plugin system.
+ * When @opencode-ai/plugin is published, these can be replaced with:
+ *   import type { Plugin, Hooks } from '@opencode-ai/plugin';
+ */
+
+interface PluginContext {
+  project?: { name?: string };
+  client?: unknown;
+  $?: unknown;
+  directory: string;
+  worktree?: unknown;
+}
+
+interface ToolDefinition {
+  description: string;
+  parameters: {
+    type: 'object';
+    properties: Record<string, unknown>;
+    required?: string[];
+  };
+  execute: (params: Record<string, unknown>) => Promise<unknown>;
+}
+
+interface Hooks {
+  event?: (input: { event: unknown }) => Promise<void>;
+  config?: (input: unknown) => Promise<void>;
+  tool?: Record<string, ToolDefinition>;
+  auth?: unknown;
+  'chat.message'?: (input: unknown, output: unknown) => Promise<void>;
+  'chat.params'?: (input: unknown, output: unknown) => Promise<void>;
+  'permission.ask'?: (input: unknown, output: unknown) => Promise<void>;
+  'command.execute.before'?: (input: unknown, output: unknown) => Promise<void>;
+  'tool.execute.before'?: (input: unknown, output: unknown) => Promise<void>;
+  'tool.execute.after'?: (input: unknown, output: unknown) => Promise<void>;
+  'experimental.chat.messages.transform'?: (input: unknown, output: unknown) => Promise<void>;
+  'experimental.chat.system.transform'?: (input: unknown, output: unknown) => Promise<void>;
+  'experimental.session.compacting'?: (input: unknown, output: unknown) => Promise<void>;
+  'experimental.text.complete'?: (input: unknown, output: unknown) => Promise<void>;
+}
+
+type Plugin = (context: PluginContext) => Promise<Hooks>;
 
 // Worker service configuration
 const WORKER_PORT = process.env.CLAUDE_MEM_PORT ? parseInt(process.env.CLAUDE_MEM_PORT, 10) : 37777;

@@ -171,7 +171,7 @@ async function buildHooks() {
       outfile: `${OPENCODE_PLUGIN.outdir}/index.js`,
       minify: false, // Keep readable for debugging
       logLevel: 'error',
-      external: ['@opencode-ai/plugin'],
+      // No external dependencies - types are defined inline
       define: {
         '__DEFAULT_PACKAGE_VERSION__': `"${version}"`
       }
